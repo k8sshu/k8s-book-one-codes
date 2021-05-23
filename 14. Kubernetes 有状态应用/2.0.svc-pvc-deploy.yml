@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql-demo
+  labels:
+    app: wordpress-demo
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: wordpress-demo
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim-demo
+  labels:
+    app: wordpress-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-mysql-demo
+  labels:
+    app: wordpress-demo
+spec:
+  selector:
+    matchLabels:
+      app: wordpress-demo
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress-demo
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:8.0
+        name: mysql
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage-demo
+          mountPath: /etc/mysql/conf.d/default.cnf
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass-demo
+              key: password
+      volumes:
+      - name: mysql-persistent-storage-demo
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim-demo

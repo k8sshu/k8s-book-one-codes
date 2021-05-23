@@ -1,0 +1,6 @@
+curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl"
+# https://storage.googleapis.com/kubernetes-release/release/stable.txt
+# 以上这个链接内容包含的是当前的稳定版本，在书写到这里时，当前的稳定版本为 v1.19.2
+
+# 我们还可以直接用版本号来替换该片段，类似如下所示：
+# curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/darwin/amd64/kubectl

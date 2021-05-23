@@ -1,0 +1,28 @@
+#在GitHub仓库的Jenkinsfile文件里的DeployToProduction阶段之上添加如下代码
+        stage('SmokeTest') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    sleep (time: 15)
+                    def response = httpRequest (
+                        url: "http://$KUBERNETES_MASTER_IP:8081",
+                        timeout: 60
+                    )
+                    if (response.status != 200) {
+                        error("金丝雀冒烟测试失败！")
+                    }
+                }
+            }
+        }
+#在stages块底下添加如下代码
+    post {
+        cleanup {
+            kubernetesDeploy(
+                kubeconfigId: 'kubeconfig',
+                configs: 'springboot-hello-world-kube-canary.yml',
+                enableConfigSubstitution: true
+            )
+        }
+    }

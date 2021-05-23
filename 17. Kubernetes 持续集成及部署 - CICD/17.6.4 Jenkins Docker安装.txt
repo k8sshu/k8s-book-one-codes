@@ -1,0 +1,8 @@
+# 添加docker组
+sudo groupadd docker
+
+# 添加用户jenkins至docker组
+sudo usermod -aG docker jenkins
+
+# 立即重启服务器，使以上变更生效
+shutdown -r now

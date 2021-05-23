@@ -1,0 +1,45 @@
+# 创建test-ns命名空间
+kubectl create namespace test-ns
+# 输出如下所示
+# namespace/test-ns created
+
+# 创建test-sa服务账号
+kubectl --namespace=test-ns create serviceaccount test-sa
+# 输出如下所示
+# serviceaccount/test-sa created
+
+# 创建test-read-role角色
+kubectl --namespace=test-ns create role test-read-role --verb=get --verb=list --resource=pods
+# 输出如下所示
+# role.rbac.authorization.k8s.io/test-read-role created
+
+# 查看test-read-role角色信息
+kubectl --namespace=test-ns describe role/test-read-role
+# 输出如下所示
+# Name:			test-read-role
+# Labels:			<none>
+# Annotations:		<none>
+# PolicyRule:
+#	Resources	Non-Resource URLs	Resource Names	Verbs
+#	---------		-----------------			--------------		-----
+#	pods			[]					[]				[get list]
+
+# 创建test-read-rb角色绑定
+kubectl --namespace=test-ns create rolebinding test-read-rb --role=test-read-role \
+--serviceaccount=test-ns:test-sa
+# 输出如下所示
+# rolebinding.rbac.authorization.k8s.io/test-read-rb created
+
+# 查看test-read-rb角色绑定信息
+kubectl --namespace=test-ns describe rolebinding/test-read-rb
+# 输出如下所示
+# Name:			test-read-rb
+# Labels:			<none>
+# Annotations:		<none>
+# Role:
+#	Kind:		Role
+#	Name:		test-read-role
+# Subjects:
+#	Kind			Name	Namespace
+#	----				----		---------
+#	ServiceAccount	test-sa	test-ns

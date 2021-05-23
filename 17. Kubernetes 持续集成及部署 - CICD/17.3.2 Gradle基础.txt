@@ -1,0 +1,27 @@
+#在build.gradle文件里添加一个名为hello的任务
+vi build.gradle
+# 将如下代码复制并粘贴至文件末尾
+task hello {
+  println 'Hello'
+}
+
+#运行hello任务
+./gradlew hello
+# 输出如下所示
+# Hello
+# BUILD SUCCESSFUL in 1s
+
+#除了运行一个任务之外，gradle还支持任务的依赖执行，来试一下
+vi build.gradle
+# 将如下代码复制并粘贴至文件末尾
+task world {
+  println 'World'
+}
+world.dependsOn hello
+
+#来尝试一下gradlew的效果，运行world任务
+./gradlew world
+# 输出如下所示
+# Hello
+# World
+# BUILD SUCCESSFUL in 1s

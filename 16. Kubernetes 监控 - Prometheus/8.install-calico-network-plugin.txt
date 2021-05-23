@@ -1,0 +1,6 @@
+# 应用Calico插件至集群中
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+
+# 检查kube-system命名空间中是否有calico相关的Pod
+kubectl get pods -n kube-system
+# 确保calico和coredns相关的Pod都已运行

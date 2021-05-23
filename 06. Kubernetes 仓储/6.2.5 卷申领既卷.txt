@@ -1,0 +1,16 @@
+#持久卷申领模板实际样例代码如下
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-example
+spec:
+  containers:
+    - name: simple-website
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: pv-example
+  volumes:
+    - name: pv-example
+      persistentVolumeClaim:
+        claimName: claim-example

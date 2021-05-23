@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-selector-nginx-pod
+  labels:
+    env: node-selector-test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  nodeSelector:
+    node2key: node2val

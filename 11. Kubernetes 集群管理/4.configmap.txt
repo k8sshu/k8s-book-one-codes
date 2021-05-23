@@ -1,0 +1,15 @@
+# 首先在当前目录创建一个子目录
+mkdir child1
+
+# 执行以下代码以在子目录中创建一个模版代码文件
+cat>child1/configmap-example.yaml<<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-example
+data:
+  test_key: "test_value"
+EOF
+
+# 遍历应用目录及子目录中的模版代码文件至集群
+kubectl apply -f . -R

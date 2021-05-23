@@ -1,0 +1,9 @@
+# 测试test-sa服务账号是否可以列出Pod列表
+kubectl --namespace=test-ns auth can-i --as=system:serviceaccount:test-ns:test-sa list pods
+# 输出如下所示
+# yes
+
+# 测试test-sa服务账号是否可以列出Service列表
+kubectl --namespace=test-ns auth can-i --as=system:serviceaccount:test-ns:test-sa list services
+# 输出如下所示
+# no

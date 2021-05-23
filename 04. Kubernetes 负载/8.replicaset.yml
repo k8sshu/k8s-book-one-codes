@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rs-gc-example
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      rs-pod: gc-example
+  template:
+    metadata:
+      labels:
+        rs-pod: gc-example
+    spec:
+      containers:
+      - name: nginx
+        image: nginx

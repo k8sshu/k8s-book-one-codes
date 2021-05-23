@@ -1,0 +1,17 @@
+#标准硬盘类型的卷动态分配存储类代码模板如下
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: sc-dynamic-std-example
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard
+
+#快速硬盘类型的卷动态分配存储类代码模板如下
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: sc-dynamic-ssd-example
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd

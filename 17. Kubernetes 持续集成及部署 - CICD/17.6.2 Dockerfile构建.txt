@@ -1,0 +1,24 @@
+#首先从GitHub克隆项目到本地（读者需要将k8sshuceshi替换成自己的GitHub用户名）
+git clone git@github.com:k8sshuceshi/springboot-hello-world.git
+
+#切换至springboot-hello-world项目根路径
+cd springboot-hello-world
+
+#构建项目以生成jar二进制文件
+./gradlew build
+
+#创建Dockerfile文件
+FROM openjdk:8-jdk-alpine
+EXPOSE 8080
+MAINTAINER dongchen.co
+COPY build/libs/spring-boot-0.0.1-SNAPSHOT.jar spring-boot-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar","/spring-boot-0.0.1-SNAPSHOT.jar"]
+
+#构建SpringBootHelloWorld镜像
+sudo docker build -t k8sshuceshi/springboot-hello-world .
+
+#尝试着运行该镜像
+sudo docker run -p 8080:8080 -d k8sshuceshi/springboot-hello-world
+
+#将该镜像推送至Docker Hub
+sudo docker push k8sshuceshi/springboot-hello-world

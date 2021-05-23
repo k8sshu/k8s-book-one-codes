@@ -1,0 +1,16 @@
+#卷克隆代码模板样例如下
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: pvc-clone-example
+    namespace: myns
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: pvc-clone-sc
+  resources:
+    requests:
+      storage: 5Gi
+  dataSource:
+    kind: PersistentVolumeClaim
+    name: pvc-example

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: guestbook
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # ReplicaSet 所能运行的最大副本数量，这里为 3
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend # 匹配template底下的label
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: php-redis
+        image: gcr.io/google_samples/gb-frontend:v3 # 这是由谷歌提供的客户簿镜像

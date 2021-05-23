@@ -1,0 +1,9 @@
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOF
+# 输出如下信息
+# serviceaccount/admin-user created

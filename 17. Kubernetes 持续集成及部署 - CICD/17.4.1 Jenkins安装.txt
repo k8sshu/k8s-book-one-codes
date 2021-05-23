@@ -1,0 +1,30 @@
+#下载Jenkins Repo至/etc/yum.repos.d目录
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+#更新yum仓库
+sudo yum -y upgrade
+
+#安装OpenJDK 1.8开发版
+sudo yum -y install java-1.8.0-openjdk-devel
+
+#安装Jenkins
+sudo yum -y install jenkins
+
+#重载系统服务守护进程
+sudo systemctl daemon-reload
+
+#开机启动Jenkins
+sudo systemctl enable jenkins
+
+#启动Jenkins
+sudo systemctl start jenkins
+
+#查看Jenkins状态
+sudo systemctl status jenkins
+
+#接下来需要到图中指定的路径获取Jenkins生成的管理员密码
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+# 输出如下所示
+# 07fb2251c199410fabd657afdcf32755

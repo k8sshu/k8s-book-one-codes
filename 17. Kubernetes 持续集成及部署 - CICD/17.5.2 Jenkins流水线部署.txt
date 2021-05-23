@@ -1,0 +1,94 @@
+#首先分别在Staging和Production服务器上安装Java 1.8
+sudo yum -y install unzip java-1.8.0-openjdk
+
+#然后再分别在两个服务器的/etc/systemd/system目录创建SpringBootHelloWorld服务
+# 创建/etc/systemd/system/SpringBootHelloWorld.service
+sudo vi /etc/systemd/system/SpringBootHelloWorld.service
+# 将如下内容复制粘贴至SpringBootHelloWorld.service里
+[Unit]
+Description=SpringBoot Hello World
+After=syslog.target
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/java -jar /opt/springboot/spring-boot-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+[Install]
+WantedBy=multi-user.target
+
+#分别在两个服务器的/opt目录里创建一个springboot目录（否则Jenkins在执行命令时服务器内部会报错No such file or directory错误）
+# 创建/opt/springboot
+sudo mkdir /opt/springboot
+
+#通过visudo命令来打开sudoers文件
+# 打开/etc/sudoers，处在/etc/sudoers.d/目录里的配置会覆盖sudoers里的配置，所以要多检查检查
+sudo visudo
+# 在user用户配置加入NOPASSWD:
+user  ALL=(ALL:ALL)       NOPASSWD: ALL
+
+#完成了Staging和Production的配置后，前往Github仓库页，打开Jenkinsfile，复制以下流水线代码到Edit file编辑区域里
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                echo '运行构建自动化'
+                sh './gradlew build --no-daemon'
+                archiveArtifacts artifacts: 'build/libs/spring-boot-0.0.1-SNAPSHOT.jar'
+            }
+        }
+        stage('DeployToStaging') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sshPublisher(
+                    failOnError: true,
+                    continueOnError: false,
+                    publishers: [
+                        sshPublisherDesc(
+                            configName: 'staging',
+                            transfers: [
+                                sshTransfer(
+                                    sourceFiles: 'build/libs/spring-boot-0.0.1-SNAPSHOT.jar',
+                                    removePrefix: 'build/libs/',
+                                    remoteDirectory: '/tmp',
+                                    execCommand: 'sudo systemctl stop SpringBootHelloWorld && sudo rm -rf /opt/springboot/spring-boot-0.0.1-SNAPSHOT.jar && sudo cp /tmp/spring-boot-0.0.1-SNAPSHOT.jar /opt/springboot && sudo systemctl start SpringBootHelloWorld'
+                                )
+                            ]
+                        )
+                    ]
+                )
+            }
+        }
+        stage('DeployToProduction') {
+            when {
+                branch 'master'
+            }
+            steps {
+                input 'Staging 环境的部署是否一切正常？'
+                milestone(1)
+                sshPublisher(
+                    failOnError: true,
+                    continueOnError: false,
+                    publishers: [
+                        sshPublisherDesc(
+                            configName: 'production',
+                            transfers: [
+                                sshTransfer(
+                                    sourceFiles: 'build/libs/spring-boot-0.0.1-SNAPSHOT.jar',
+                                    removePrefix: 'build/libs/',
+                                    remoteDirectory: '/tmp',
+                                    execCommand: 'sudo systemctl stop SpringBootHelloWorld && sudo rm -rf /opt/springboot/spring-boot-0.0.1-SNAPSHOT.jar && sudo cp /tmp/spring-boot-0.0.1-SNAPSHOT.jar /opt/springboot && sudo systemctl start SpringBootHelloWorld'
+                                )
+                            ]
+                        )
+                    ]
+                )
+            }
+        }
+    }
+}
+
+#登陆Staging服务器，通过systemctl status来查看SpringBootHelloWorl服务是否正在运行中
+sudo systemctl status SpringBootHelloWorld

@@ -1,0 +1,13 @@
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: allow-db
+spec:
+  # Pod 标签选择器，将匹配 role:frontend-app 标签的 Pod
+  selector:
+    matchLabels:
+      role: frontend-app
+  # 环境变量
+  env:
+    - name: DB_PORT
+      value: "6379"

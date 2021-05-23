@@ -1,0 +1,22 @@
+# 更新系统现有的包
+sudo apt-get update
+
+# 安装Containerd
+sudo apt-get install -y containerd
+# 如果得到以下信息
+# E: Could not get lock /var/lib/dpkg/lock-frontend
+# 则需要执行如下步骤来解除锁
+
+# 首先获取到这些文件里的PID值
+sudo lsof /var/lib/dpkg/lock
+sudo lsof /var/lib/apt/lists/lock
+sudo lsof /var/cache/apt/archives/lock
+# 输出如下所示
+# COMMAND    PID USER   FD   TYPE DEVICE SIZE/OFF  NODE NAME
+# unattende 3243 root   99uW  REG  259,1        0 62506 /var/cache/apt/archives/lock
+
+# 终止进程并删除锁文件
+sudo kill -9 3243
+sudo rm /var/lib/apt/lists/lock
+sudo rm /var/cache/apt/archives/lock
+sudo rm /var/lib/dpkg/lock

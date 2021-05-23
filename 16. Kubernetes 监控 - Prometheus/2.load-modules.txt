@@ -1,0 +1,10 @@
+# 第一步：让系统在启动时自动加载模块
+# 在内核模块加载目录里新建一个containerd.conf文件并在其中指定overlay和br_netfilter两个模块
+sudo tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
+
+# 第二步：立即将模块加载至系统中
+sudo modprobe overlay
+sudo modprobe br_netfilter

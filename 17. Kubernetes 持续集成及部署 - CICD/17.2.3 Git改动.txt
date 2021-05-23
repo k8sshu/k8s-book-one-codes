@@ -1,0 +1,54 @@
+git clone git@github.com:k8sshuceshi/springboot-hello-world.git
+# 遇到Are you sure you want to continue connecting (yes/no)? 问题时输入yes并回车
+# 遇到Enter passphrase for key '/home/cloud_user/.ssh/id_rsa': 请求时输入生成私钥时提供的密码
+
+#切换至克隆到本地的仓库目录
+cd springboot-hello-world
+
+#查看本地仓库文件状态（可以查看已暂存、未暂存的提交，以及当前使用的分支）
+git status
+# 输出如下所示
+# nothing to commit, working directory clean
+# 以上输出表示处在master分支中，且工作目录中没有需要提交的内容
+
+#更新本地仓库文件
+vi src/main/java/com/example/springboot/HelloController.java
+# 将Greetings from Spring Boot! 改成Greetings from k8s!
+
+#再次查看本地仓库文件状态
+git status
+# 输出如下所示
+#       modified:   src/main/java/com/example/springboot/HelloController.java
+# 以上输出显示HelloController.java这个文件做了改动但未被添加至暂存区中
+
+#添加更新的文件至暂存区
+git add .
+# 或者git add -A
+
+#再次查看本地仓库文件状态
+git status
+# 输出如下所示
+#       modified:   src/main/java/com/example/springboot/HelloController.java
+# 以上输出显示HelloController.java这个文件可以从暂存区中被移出并且等待提交至本地仓库
+
+#提交暂存区的文件至本地仓库
+git commit -m "将Spring Boot改成了k8s"
+# 输出如下所示
+# 1 file changed, 1 insertion(+), 1 deletion(-)
+
+#再次查看本地仓库文件状态
+git status
+# 输出如下所示
+# Your branch is ahead of 'origin/master' by 1 commit.
+#   (use "git push" to publish your local commits)
+# 以上输出显示来自master源的分支有一个提交，可使用git push将本地提交发布至代码托管平台
+
+#将本地仓库的文件发布至代码托管平台（克隆的仓库托管在Github平台）
+git push
+# 遇到Enter passphrase时输入生成私钥时输入的密码
+
+#再次查看本地仓库文件状态
+git status
+# 输出如下所示
+# nothing to commit, working directory clean
+# 以上输出显示工作目录中没有需要提交的内容

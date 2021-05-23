@@ -1,0 +1,8 @@
+# 创建Containerd配置文件目录
+sudo mkdir -p /etc/containerd
+
+# 配置Containerd默认配置
+sudo containerd config default | sudo tee /etc/containerd/config.toml
+
+# 重启Containerd
+sudo systemctl restart containerd

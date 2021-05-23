@@ -1,0 +1,15 @@
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# 输出如下所示
+# "prometheus-community" has been added to your repositories
+
+# 更新Chart仓库
+helm repo update
+# 输出如下所示
+# Hang tight while we grab the latest from your chart repositories...
+# ...Successfully got an update from the "prometheus-community" chart repository
+
+# 查看Chart仓库列表
+helm repo list
+# 输出信息如下
+# NAME					URL                          
+# prometheus-community		https://prometheus-community.github.io/helm-charts

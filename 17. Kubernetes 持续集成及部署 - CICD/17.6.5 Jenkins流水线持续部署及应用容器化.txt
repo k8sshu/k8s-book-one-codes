@@ -1,0 +1,103 @@
+#首先在新Fork的GitHub仓库里添加一个Dockerfile文件，并填入如下内容
+FROM openjdk:8-jdk-alpine
+EXPOSE 8080
+MAINTAINER dongchen.co
+COPY build/libs/spring-boot-0.0.1-SNAPSHOT.jar spring-boot-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar","/spring-boot-0.0.1-SNAPSHOT.jar"]
+
+#提交之后在Experiment服务器上进行测试，克隆仓库到本地
+git clone git@github.com:k8sshuceshi/springboot-hello-world-docker.git
+
+#切换进项目根目录
+cd springboot-hello-world-docker
+
+#通过Gradle构建项目
+./gradlew build
+
+#构建Docker容器镜像
+sudo docker build -t k8sshuceshi/springboot-hello-world-docker .
+
+#运行刚构建的镜像
+sudo docker run -p 8080:8080 -d k8sshuceshi/springboot-hello-world-docker
+
+#终止之前启动的实例
+sudo docker ps
+
+#终止实例
+sudo docker stop 9720a93b4c75
+
+#再次尝试运行刚构建的镜像
+sudo docker run -p 8080:8080 -d k8sshuceshi/springboot-hello-world-docker
+
+#再在GitHub仓库里创建一个Jenkinsfile文件，内容如下
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                echo '运行构建自动化'
+                sh './gradlew build --no-daemon'
+                archiveArtifacts artifacts: 'build/libs/spring-boot-0.0.1-SNAPSHOT.jar'
+            }
+        }
+        stage('Build Docker Image') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    app = docker.build("k8sshuceshi/springboot-hello-world-docker")
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+    }
+}
+
+#接下来往Jenkinsfile里添加一个DeployToProduction阶段
+stage('DeployToProduction') {
+    when {
+        branch 'master'
+    }
+    steps {
+        input 'Deploy to Production?'
+        milestone(1)
+        withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+            script {
+                sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$production_ip \"docker pull k8sshuceshi/springboot-hello-world-docker:${env.BUILD_NUMBER}\""
+                try {
+                    sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$production_ip \"docker stop springboot-hello-world-docker\""
+                    sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$production_ip \"docker rm springboot-hello-world-docker\""
+                } catch (err) {
+                    echo: 'caught error: $err'
+                }
+                sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$production_ip \"docker run --restart always --name springboot-hello-world-docker -p 8080:8080 -d k8sshuceshi/springboot-hello-world-docker:${env.BUILD_NUMBER}\""
+            }
+        }
+    }
+}
+
+#在Jenkins服务器安装SSHPass，在流水线里以无交互方式使用ssh访问生产环境
+sudo yum install -y sshpass
+
+#在Production服务器添加user用户至docker组
+# 添加docker组
+sudo groupadd docker
+
+# 添加用户user至docker组
+sudo usermod -aG docker user
+
+# 立即重启服务器，使以上变更生效
+sudo shutdown -r now

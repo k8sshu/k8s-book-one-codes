@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-nginx-example
+spec:
+  selector:
+    matchLabels:
+      run: pod-nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: pod-nginx
+    spec:
+      containers:
+      - name: pod-nginx-container
+        image: nginx
+        ports:
+        - containerPort: 80

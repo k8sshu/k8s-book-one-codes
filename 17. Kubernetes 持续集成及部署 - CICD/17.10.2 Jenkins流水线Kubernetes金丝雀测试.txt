@@ -1,0 +1,84 @@
+#在Spring Boot仓库创建一个名为springboot-hello-world-kube-canary.yml的新文件
+kind: Service
+apiVersion: v1
+metadata:
+  name: springboot-hello-world-service-canary
+spec:
+  type: NodePort
+  selector:
+    app: springboot-hello-world-canary
+    track: canary
+  ports:
+  - protocol: TCP
+    port: 8080
+    nodePort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-hello-world-deployment-canary
+  labels:
+    app: springboot-hello-world
+spec:
+  replicas: $CANARY_REPLICAS
+  selector:
+    matchLabels:
+      app: springboot-hello-world
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: springboot-hello-world
+        track: canary
+    spec:
+      containers:
+      - name: springboot-hello-world
+        image: $DOCKER_IMAGE_NAME:$BUILD_NUMBER
+        ports:
+          - containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+
+#在Jenkinsfile里做如下改动，这里添加了一个CanaryDeploy阶段并在DeployToProduction阶段里也添加了Pod数变量和新的kubernetesDeploy代码
+        stage('CanaryDeploy') {
+            when {
+                branch 'master'
+            }
+            // 金丝雀部署 1 个 Pod
+            environment {
+                CANARY_REPLICAS = 1
+            }
+            steps {
+                // 根据配置的 springboot-hello-world-kube-canary.yml 模版来部署镜像至 Kubernetes
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig',
+                    configs: 'springboot-hello-world-kube-canary.yml',
+                    enableConfigSubstitution: true
+                )
+            }
+        }
+        stage('DeployToProduction') {
+            when {
+                branch 'master'
+            }
+            // 金丝雀部署 0 个 Pod
+            environment {
+                CANARY_REPLICAS = 0
+            }
+            steps {
+                input 'Deploy to Production?'
+                milestone(1)
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig',
+                    configs: 'springboot-hello-world-kube-canary.yml',
+                    enableConfigSubstitution: true
+                )
+                // 根据配置的 springboot-hello-world-kube.yml 模版来部署镜像至 Kubernetes
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig',
+                    configs: 'springboot-hello-world-kube.yml',
+                    enableConfigSubstitution: true
+                )
+            }
+        }

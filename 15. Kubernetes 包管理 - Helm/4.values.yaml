@@ -1,0 +1,15 @@
+image:
+  pullPolicy: Always				# 无论集群中是否有，都要拉取
+nameOverride: "custom-nginx-app"		# Chart 名称重写
+fullnameOverride: "custom-nginx-chart"		# Chart 全称重写
+serviceAccount:
+  name: nginx-sa				# 服务账号名称
+service:
+  type: NodePort				# 集群外部访问类型
+resources:					# 测试环境通常资源有限，所以设小点
+   limits:
+     cpu: 100m
+     memory: 128Mi
+   requests:
+     cpu: 100m
+     memory: 128Mi

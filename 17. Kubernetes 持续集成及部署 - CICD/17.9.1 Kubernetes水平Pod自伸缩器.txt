@@ -1,0 +1,50 @@
+#将Metrics Server应用至集群中
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+#查看Metrics应用结果
+kubectl get --raw /apis/metrics.k8s.io/
+
+#在仓库的springboot-hello-world-kube.yml文件里的containers底下添加如下代码
+        resources:
+          requests:
+            cpu: 200m
+
+#在SpringBoot仓库里添加一个CalculatorController控制器来进行非健康应用的演示，具体代码如下
+@RestController
+public class CalculatorController {
+        @RequestMapping("/calculate")
+        public String calculate() {
+                double val = 0.001;
+                for (int i = 0; i < 1000000; i++) {
+                        val += Math.sqrt(val);
+                }
+                return "暴力计算中！";
+        }
+}
+
+#创建水平Pod自伸缩器
+kubectl autoscale deployment springboot-hello-world-deployment --cpu-percent=50 --min=1 --max=5
+
+#观察水平Pod伸缩器列表
+kubectl get hpa -w
+
+#在args底下加入- --kubelet-insecure-tls
+kubectl edit deployment metrics-server -n kube-system
+#完整的args如下所示
+- args:
+  - --cert-dir=/tmp
+  - --secure-port=4443
+  - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+  - --kubelet-use-node-status-port
+  - --kubelet-insecure-tls
+
+#新建一个主节点的bash操作窗口，运行busybox并进入shell环境
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+while true; do wget -q -O- http://172.31.41.109:8080/calculate; done
+
+#移除HPA
+kubectl delete hpa springboot-hello-world-deployment
+
+#移除Spring Boot部署
+kubectl delete deployment springboot-hello-world-deployment
+kubectl delete svc springboot-hello-world-service

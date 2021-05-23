@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-pod-example
+spec:
+  containers:
+  - name: secret-pod-example
+    image: redis
+    volumeMounts:
+    - name: secret-path
+      mountPath: "/etc/secret-path"
+      readOnly: true
+  volumes:
+  - name: secret-path
+    secret:
+      secretName: user-credential

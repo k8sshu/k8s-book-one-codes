@@ -1,0 +1,11 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: pod-scaler
+spec:
+  scaleTargetRef:
+    kind: ReplicaSet
+    name: guestbook
+  minReplicas: 3 # 最小只能缩小至 3 个副本
+  maxReplicas: 6 # 最大只能扩充至 6 个副本
+  targetCPUUtilizationPercentage: 50

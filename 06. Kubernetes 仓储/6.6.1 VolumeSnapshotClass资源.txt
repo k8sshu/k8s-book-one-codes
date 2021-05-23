@@ -1,0 +1,19 @@
+#卷快照类模板样例如下
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshotClass
+metadata:
+  name: vsc-example
+driver: hostpath.csi.k8s.io
+deletionPolicy: Delete
+parameters:
+
+#为没有绑定的卷快照指定默认卷快照类
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshotClass
+metadata:
+  name: vsc-use-default-example
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true"
+driver: hostpath.csi.k8s.io
+deletionPolicy: Delete
+parameters:

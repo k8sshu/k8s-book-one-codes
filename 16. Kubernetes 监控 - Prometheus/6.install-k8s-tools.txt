@@ -1,0 +1,16 @@
+# 更新系统现有的包并安装apt-transport-https和curl
+sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+
+# 添加包密钥
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+# 添加Kubernetes包源
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+# 更新系统现有的包并安装kubelet、kubeadm以及kubectl
+sudo apt-get update && sudo apt-get install -y kubelet=1.20.2-00 kubeadm=1.20.2-00 kubectl=1.20.2-00
+
+# Hold 住这三个软件的当前版本，防止其自动更新至最新版
+sudo apt-mark hold kubelet kubeadm kubectl

@@ -1,0 +1,13 @@
+#默认情况下是没有的，需要通过以下命令来对kubeadm-config配置进行编辑
+kubectl edit configmap kubeadm-config -n kube-system
+# 编辑后的内容如下
+    apiServer:
+      extraArgs:
+        authorization-mode: Node,RBAC
+        service-node-port-range: 8080-32767
+      timeoutForControlPlane: 4m0s
+#保存后kube-apiserver将会自动重启。
+
+#可以将主节点的apiServer配置导出成文件，然后到将其应用至控制面阶段
+kubectl -n kube-system get configmap kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' > kubeadm-config.yaml
+sudo kubeadm init phase control-plane apiserver --config kubeadm-config.yaml

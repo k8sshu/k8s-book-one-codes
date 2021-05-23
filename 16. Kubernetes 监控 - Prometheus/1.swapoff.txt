@@ -1,0 +1,5 @@
+# 禁用内存中的Swap
+sudo swapoff -a
+
+# 确保系统重启后Swap还是禁用着的
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab

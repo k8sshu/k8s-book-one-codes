@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    run: nginx-secure
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    name: http
+  - port: 443
+    protocol: TCP
+    name: https
+  selector:
+    run: nginx-secure
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginx-replication
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: nginx-secure
+    spec:
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: nginxsecret
+      - name: configmap-volume
+        configMap:
+          name: nginx-configmap
+      containers:
+      - name: nginx-https
+        image: ymqytw/nginxhttps:1.5
+        command: ["/home/auto-reload-nginx.sh"]
+        ports:
+        - containerPort: 443
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+        volumeMounts:
+        - mountPath: /etc/nginx/ssl
+          name: secret-volume
+        - mountPath: /etc/nginx/conf.d
+          name: configmap-volume

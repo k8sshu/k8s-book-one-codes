@@ -1,0 +1,12 @@
+# 将服务器本机的9090端口映射至Prometheus服务
+kubectl port-forward -n monitoring service/prometheus-kube-prometheus-prometheus 9090
+# 输出如下所示
+# Forwarding from 127.0.0.1:9090 -> 9090
+# Forwarding from [::1]:9090 -> 9090
+# 执行以上命令之后，需要重新开启一个终端来进行后续操作
+
+# 在新终端里试着访问9090端口
+curl localhost:9090
+# 输出如下所示
+# <a href="/graph">Found</a>.
+# 以上输出表示端口以成功映射至Prometheus服务

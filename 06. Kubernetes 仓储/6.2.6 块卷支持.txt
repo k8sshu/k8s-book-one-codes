@@ -1,0 +1,48 @@
+#持久卷模板样例代码如下
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: block-pv-example
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Block
+  persistentVolumeReclaimPolicy: Retain
+  fc:
+    targetWWNs: ["50060e801049cfd1"]
+    lun: 0
+    readOnly: false
+
+#卷申领模板样例代码如下
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: block-pvc-example
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Block
+  resources:
+    requests:
+      storage: 10Gi
+
+#在Pod中使用声明好的卷申领
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-pv-pvc-example
+spec:
+  containers:
+    - name: fc-container
+      image: fedora:26
+      command: ["/bin/sh", "-c"]
+      args: [ "tail -f /dev/null" ]
+      volumeDevices:
+        - name: data
+         devicePath: /dev/xvda
+  volumes:
+    - name: data
+     persistentVolumeClaim:
+       claimName: block-pvc-example

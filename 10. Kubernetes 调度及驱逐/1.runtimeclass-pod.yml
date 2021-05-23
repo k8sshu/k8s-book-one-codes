@@ -1,0 +1,33 @@
+apiVersion: node.k8s.io/v1beta1
+kind: RuntimeClass
+metadata:
+    name: memory-cpu-limitation
+handler: memory-cpu-limitation
+overhead:
+    podFixed:
+        memory: "125Mi"
+        cpu: "200m"
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: memory-cpu-limitation-pod
+spec:
+  runtimeClassName: memory-cpu-limitation
+  containers:
+  - name: busybox-container
+    image: busybox
+    stdin: true
+    tty: true
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 80Mi
+  - name: nginx-container
+    image: nginx
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 150Mi

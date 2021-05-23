@@ -1,0 +1,11 @@
+# 查看 Chart 仓库
+helm repo list
+
+# 添加 Chart 仓库：
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+
+# 再查看一次 Chart 仓库列表：
+helm repo list
+
+# 最后来看一下稳定版的 Chart 都有哪些
+helm search repo stable

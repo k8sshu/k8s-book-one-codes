@@ -1,0 +1,2 @@
+#查看节点详情
+kubectl describe node minikube

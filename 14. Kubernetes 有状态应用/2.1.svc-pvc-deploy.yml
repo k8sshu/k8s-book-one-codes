@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-app
+  labels:
+    app: wordpress-demo
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: wordpress-demo
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-pv-claim-demo
+  labels:
+    app: wordpress-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-app
+  labels:
+    app: wordpress-demo
+spec:
+  selector:
+    matchLabels:
+      app: wordpress-demo
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress-demo
+        tier: frontend
+    spec:
+      containers:
+      - image: wordpress:5.6-apache
+        name: wordpress-app
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: wordpress-mysql-demo
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass-demo
+              key: password
+        ports:
+        - containerPort: 80
+          name: wordpress-app
+        volumeMounts:
+        - name: wordpress-persistent-storage-demo
+          mountPath: /var/www/html
+      volumes:
+      - name: wordpress-persistent-storage-demo
+        persistentVolumeClaim:
+          claimName: wp-pv-claim-demo

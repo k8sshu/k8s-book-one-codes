@@ -1,0 +1,8 @@
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+  && chmod +x minikube
+
+# 将其安装至 /usr/local/bin/ PATH 环境变量目录中：
+sudo install minikube /usr/local/bin/
+# 如果运行minikube时提示找不到命令，则需要将将该路径加入环境变量
+echo "PATH=\$PATH:/usr/local/bin" >> ~/.bashrc
+. ~/.bashrc

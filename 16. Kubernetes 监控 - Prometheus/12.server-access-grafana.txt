@@ -1,0 +1,17 @@
+# 查看Grafana部署的Pod
+kubectl get pod -n monitoring|grep grafana
+# 输出如下所示
+# prometheus-grafana-9bdf8fbd7-kdzqw	2/2	Running		0	121m
+
+# 将本机的3000端口映射至Grafana服务
+kubectl port-forward -n monitoring prometheus-grafana-9bdf8fbd7-kdzqw 3000
+# 输出如下所示
+# Forwarding from 127.0.0.1:3000 -> 3000
+# Forwarding from [::1]:3000 -> 3000
+# 执行以上命令之后，需要重新开启一个终端来进行后续操作
+
+# 在新终端里试着访问3000端口
+curl localhost:3000
+# 输出如下所示
+# <a href="/login">Found</a>.
+# 以上输出表示端口以成功映射至Grafana的Pod

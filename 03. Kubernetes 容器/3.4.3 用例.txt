@@ -1,0 +1,7 @@
+#指定RuntimeClass来运行pod的样例
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testpod
+spec:
+  runtimeClassName: testclass     # 若没有指定该标签，则表示禁用运行时类的特性

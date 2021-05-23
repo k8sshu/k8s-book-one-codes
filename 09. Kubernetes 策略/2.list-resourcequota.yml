@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: large-quota
+  spec:
+    hard:
+      cpu: "1024"
+      memory: 248Gi
+      pods: "10"
+    scopeSelector:
+      matchExpressions:
+      - operator : In
+        scopeName: PriorityClass
+        values: ["large"]
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: medium-quota
+  spec:
+    hard:
+      cpu: "16"
+      memory: 32Gi
+      pods: "10"
+    scopeSelector:
+      matchExpressions:
+      - operator : In
+        scopeName: PriorityClass
+        values: ["medium"]
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: small-quota
+  spec:
+    hard:
+      cpu: "8"
+      memory: 16Gi
+      pods: "10"
+    scopeSelector:
+      matchExpressions:
+      - operator : In
+        scopeName: PriorityClass
+        values: ["small"]

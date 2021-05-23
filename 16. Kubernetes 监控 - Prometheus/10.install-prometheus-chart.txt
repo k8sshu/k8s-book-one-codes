@@ -1,0 +1,37 @@
+# 首先创建一个monitoring命名空间，用来关联所有监控相关的Pod
+kubectl create ns monitoring
+# 输出如下所示
+# namespace/monitoring created
+
+# 安装Prometheus至monitoring命名空间中，安装过程需要等待几分钟
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+# 如果安装成功，则会显示如下信息
+# NAME: prometheus
+# LAST DEPLOYED: Sat Apr  3 15:04:42 2021
+# NAMESPACE: monitoring
+# STATUS: deployed
+# REVISION: 1
+# NOTES:
+# kube-prometheus-stack has been installed. Check its status by running:
+#   kubectl --namespace monitoring get pods -l "release=prometheus"
+# Visit https://github.com/prometheus-operator/kube-prometheus for instructions on how to create &
+# configure Alertmanager and Prometheus instances using the Operator.
+
+# 查看Prometheus的Pod
+kubectl --namespace monitoring get pods -l "release=prometheus"
+
+# 如果安装失败并显示unable to build kubernetes objects from release manifest
+# 则在重试之前需要运行以下所列命令来清空安装失败之前所产生的定制资源
+helm uninstall prometheus --namespace monitoring
+kubectl delete crd alertmanagerconfigs.monitoring.coreos.com
+kubectl delete crd alertmanagers.monitoring.coreos.com
+kubectl delete crd podmonitors.monitoring.coreos.com
+kubectl delete crd probes.monitoring.coreos.com
+kubectl delete crd prometheuses.monitoring.coreos.com
+kubectl delete crd prometheusrules.monitoring.coreos.com
+kubectl delete crd servicemonitors.monitoring.coreos.com
+kubectl delete crd thanosrulers.monitoring.coreos.com
+
+# 如果安装失败并且显示的错误消息很笼统时，则可以运行以下命令来查看monitoring命名空间中最
+# 近发生的事件
+kubectl -n monitoring get events --sort-by='{.lastTimestamp}'

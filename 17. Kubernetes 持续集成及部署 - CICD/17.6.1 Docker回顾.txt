@@ -1,0 +1,57 @@
+开始Docker的安装
+# 为了保证安装不会出错，假设有老版本Docker，则需要将环境清干净
+sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+
+# 安装yum-utils
+sudo yum install -y yum-utils
+
+# 添加Docker社区版仓库至yum
+sudo yum-config-manager \
+   --add-repo \
+   https://download.docker.com/linux/centos/docker-ce.repo
+
+# 安装Docker社区版、Docker社区版命令行工具以及Containerd
+sudo yum install -y docker-ce docker-ce-cli containerd.io
+
+# 启动Docker并使其开机启动
+sudo systemctl start docker
+sudo systemctl enable docker
+
+#首先登录Docker Hub，命令如下
+sudo docker login --username=k8sshuceshi
+# 回车之后输入登录密码，如果登录成功，则会输出如下内容
+# WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+# Configure a credential helper to remove this warning. See
+# https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+# Login Succeeded
+
+#创建Docker实验目录
+mkdir docker-experiment
+cd docker-experiment
+
+#创建一个Dockerfile文件
+vi Dockerfile
+#内容如下
+FROM ubuntu
+CMD ["/bin/bash", "-c", "while true; do echo Hello; sleep 1; done"]
+
+#构建位于k8sshuceshi用户名下的hello-world容器
+sudo docker build -t k8sshuceshi/hello-world .
+
+#运行一下刚创建的镜像
+sudo docker run -d k8sshuceshi/hello-world
+# 输出如下所示
+# f0f17c36c75887cb266f9d330e06fb24e4f7ef71145369c5778e69fd4afeb46b
+
+#查看镜像实例运行情况
+sudo docker ps
+
+#尝试着把这个镜像推送至Docker Hub
+sudo docker push k8sshuceshi/hello-world

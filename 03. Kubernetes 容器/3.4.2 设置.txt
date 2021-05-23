@@ -1,0 +1,6 @@
+#一个运行时类配置的样例
+apiVersion: node.k8s.io/v1beta1		# RuntimeClass 存在于 node.k8s.io 中
+kind: RuntimeClass           		# RuntimeClass 是集群层的资源
+metadata:
+  name: testclass            		# RuntimeClass 名称
+handler: testconfiguration     		# 要使用的 CRI 配置名称

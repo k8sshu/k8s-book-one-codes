@@ -1,0 +1,1 @@
+kubectl get secret testuser-token-7z7vb -o jsonpath='{.data.token}' | base64 --decode

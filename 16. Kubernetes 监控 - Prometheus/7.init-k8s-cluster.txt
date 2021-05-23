@@ -1,0 +1,14 @@
+# 初始化集群，由于Calico的CALICO_IPV4POOL_CIDR值为192.168.0.0/16，所以需要指定
+sudo kubeadm init --pod-network-cidr 192.168.0.0/16
+
+# 创建Kubernetes配置目录
+mkdir -p $HOME/.kube
+
+# 将Kubernetes配置复制到新建的目录中
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+# 将复制过去的文件的所有者以及所有组与当前用户以及组关联
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# 验证集群是否正常工作
+kubectl version
